@@ -40,14 +40,18 @@ class RainDrop {
         this.x = Random(10, 640);
         this.y = 0;
 
-        this.width = 7;
+        this.width = 2;
         this.height = 30;
 
         this.hue = Random(230, 255);
 
         this.falling = true;
-        this.speed = Random(5, 10);
-        this.maxY = Math.floor(HEIGHT - this.width / 2);
+        this.speed = Random(8, 15);
+        this.maxY = Math.floor(HEIGHT - this.height / 2);
+
+        this.puddleWidth = 2;
+        this.puddleHeight = 2;
+        this.maxPuddleWidth = Random(20, 30);
     }
 
     update(){
@@ -57,17 +61,21 @@ class RainDrop {
         }
         else {
             this.y++;
-            this.width += 2;
-            this.height -= 2;
+            this.puddleWidth+=2;
         }
     }
 
     shouldKill(){
-        return this.height < 15;
+        return this.puddleWidth > this.maxPuddleWidth;
     }
 
     draw(){
         fill(this.hue, 50, 75);
-        ellipse(this.x, this.y, this.width, this.height);
+        rect(this.x, this.y, this.width, this.height);
+
+        if(!this.falling){
+            fill(this.hue, 50, 50);
+            rect(this.x - this.puddleWidth / 2, HEIGHT - this.puddleHeight, this.puddleWidth, this.puddleHeight);
+        }
     }
 }
