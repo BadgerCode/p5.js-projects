@@ -21,7 +21,7 @@ function draw() {
 
     if(iterationsTilSpawn <= 0){
         particles.push(new RainDrop());
-        iterationsTilSpawn = Random(2, 4);
+        iterationsTilSpawn = Random(1, 10);
     }
     else {
         iterationsTilSpawn--;
@@ -30,10 +30,13 @@ function draw() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  for(var i = 0; i < particles.length; i++){
+    particles[i].updateMaxY();
+  }
 }
 
 function Random(min, max){
-    return Math.floor(Math.random()*(max-min+1)+min);
+    return Math.floor(Math.random()*(max-min)+min);
 }
 
 class RainDrop {
@@ -47,22 +50,27 @@ class RainDrop {
         this.hue = (this.x / windowWidth) * 365;
 
         this.falling = true;
-        this.speed = Random(8, 15);
-        this.maxY = Math.floor(windowHeight - this.height / 2);
+        this.speed = Random(10, 15);
+        this.updateMaxY();
 
-        this.puddleWidth = 2;
+        this.puddleWidth = 3;
         this.puddleHeight = 4;
-        this.maxPuddleWidth = Random(20, 30);
+        this.puddleGrowthRate = Math.random() * 1 + 0.5;
+        this.maxPuddleWidth = this.puddleWidth + Random(5, 15) * this.puddleGrowthRate;
+    }
+
+    updateMaxY(){
+        this.maxY = Math.floor(windowHeight - this.height);
     }
 
     update(){
+        this.y += this.speed;
+
         if(this.falling){
-            this.y += this.speed;
             this.falling = this.y < this.maxY;
         }
         else {
-            this.y++;
-            this.puddleWidth+=2;
+            this.puddleWidth += this.puddleGrowthRate;
         }
     }
 
