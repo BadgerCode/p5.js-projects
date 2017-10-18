@@ -1,5 +1,6 @@
 let particles = [];
 let iterationsTilSpawn = 0;
+let hueStart = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -21,11 +22,13 @@ function draw() {
 
     if(iterationsTilSpawn <= 0){
         particles.push(new RainDrop());
-        iterationsTilSpawn = Random(1, 10);
+        iterationsTilSpawn = Random(-1, 4);
     }
     else {
         iterationsTilSpawn--;
     }
+
+    hueStart = (hueStart + 1) % 360;
 }
 
 function windowResized() {
@@ -36,7 +39,11 @@ function windowResized() {
 }
 
 function Random(min, max){
-    return Math.floor(Math.random()*(max-min)+min);
+    return Math.floor(RandomDouble(min, max));
+}
+
+function RandomDouble(min, max){
+    return Math.random()*(max-min)+min;
 }
 
 class RainDrop {
@@ -45,17 +52,17 @@ class RainDrop {
         this.y = 0;
 
         this.width = 3;
-        this.height = 30;
+        this.height = Random(30,50);
 
-        this.hue = (this.x / windowWidth) * 365;
+        this.hue = ((this.x / windowWidth) * 360 + hueStart) % 360;
 
         this.falling = true;
-        this.speed = Random(10, 15);
+        this.speed = Random(30, 35);
         this.updateMaxY();
 
         this.puddleWidth = 3;
-        this.puddleHeight = 4;
-        this.puddleGrowthRate = Math.random() * 1 + 0.5;
+        this.puddleHeight = 6;
+        this.puddleGrowthRate = RandomDouble(2, 6);
         this.maxPuddleWidth = this.puddleWidth + Random(5, 15) * this.puddleGrowthRate;
     }
 
