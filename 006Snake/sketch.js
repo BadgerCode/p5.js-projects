@@ -10,6 +10,8 @@ let food;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
+  colorMode(HSB);
+
   snake = new Snake();
   food = new Food();
 }
@@ -17,7 +19,7 @@ function setup() {
 function draw() {
   update();
 
-  background(125);
+  background(0, 0, 75);
   food.draw();
   snake.draw();
 }
@@ -25,13 +27,13 @@ function draw() {
 function update(){
   var newDirection = snake.direction;
 
-  if(keyIsDown(68))
+  if(keyIsDown(68) || keyIsDown(RIGHT_ARROW))
     newDirection = 0;
-  else if(keyIsDown(83))
+  else if(keyIsDown(83) || keyIsDown(DOWN_ARROW))
     newDirection = 1;
-  else if(keyIsDown(65))
+  else if(keyIsDown(65) || keyIsDown(LEFT_ARROW))
     newDirection = 2;
-  else if(keyIsDown(87))
+  else if(keyIsDown(87) || keyIsDown(UP_ARROW))
     newDirection = 3;
 
   if(newDirection % 2 != snake.direction % 2)
@@ -46,7 +48,7 @@ class Food {
   }
 
   draw(){
-    fill(255, 0, 0);
+    fill(0, 100, 100);
     noStroke();
     rect(this.x, this.y, TILE_SIZE, TILE_SIZE);
   }
@@ -124,8 +126,9 @@ class Snake {
 
   draw(){
     noStroke();
-    fill(0, 0, 0);
     for(var i = 0; i < this.segments.length; i++){
+      fill(this.getSegementColour(i));
+
       var segment = this.segments[i];
       rect(segment.x, segment.y, TILE_SIZE, TILE_SIZE);
     }
@@ -143,5 +146,23 @@ class Snake {
 
   timeToMove(){
     return millis() - this.lastMove >= 250;
+  }
+
+  getSegementColour(index){
+    if(index == 0)
+      return color(132.4, 88, 28.4);
+
+    var normalisedIndex = (index - 1) % 3;
+
+    switch(normalisedIndex){
+      case -1:
+        return color(132.4, 88, 28.4);
+      case 0:
+        return color(132.4, 37, 28.4);
+      case 1:
+        return color(132.4, 37, 16.4);
+      case 2:
+        return color(132.4, 37, 8.4);
+    }
   }
 }
