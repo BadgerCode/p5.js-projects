@@ -1,8 +1,8 @@
-let cols = 40;
-let rows = 30;
-let boxWidth = 40;
-let xOffset = -cols * boxWidth / 2;
-let yOffset = -rows * boxWidth * 0.80;
+let cols = 55;
+let rows = 56;
+let boxWidth = 30;
+let xOffset;
+let yOffset;
 let noiseScale = 0.1;
 let noiseYOffset = 0;
 
@@ -11,21 +11,27 @@ let heightMapOffset = 0;
 let heightMapPosition = 0;
 
 let maxHue = 40;
-let hueMultiplier = maxHue / rows;
 let hues = Array();
 
 let fpsDiv;
 
 let lastFrameStart;
 
+var fpsCountEnabled = 0;
 let framesBetweenShifts = 3;
 let framesTilShift = framesBetweenShifts;
-let cameraShiftPerFrame = boxWidth / (framesBetweenShifts+1);
+let cameraShiftPerFrame;
 
 function setup() {
     createCanvas(windowWidth, windowHeight, WEBGL);
     fpsDiv = createFPSElement();
     colorMode(HSB)
+
+    xOffset = -cols * boxWidth / 2;
+    yOffset = -rows * boxWidth * 0.80;
+    cameraShiftPerFrame = boxWidth / (framesBetweenShifts+1);
+
+    var hueMultiplier = maxHue / rows;
 
     for (var y = 0; y < rows+1; y++) {
         var row = Array();
@@ -40,8 +46,18 @@ function setup() {
     lastFrameStart = millis();
 }
 
+function keyPressed(){
+    if(keyCode == 32){
+        fpsCountEnabled = ++fpsCountEnabled % 2;
+        fpsDiv.style('display', fpsCountEnabled ? 'block' : 'none');
+    }
+}
+
 function draw() {
-    setFrameDuration(millis() - lastFrameStart);
+
+    if(fpsCountEnabled)
+        setFrameDuration(millis() - lastFrameStart);
+
     lastFrameStart = millis();
     background(10);
 
@@ -80,6 +96,9 @@ function draw() {
             vertex(x * boxWidth, (y+1) * boxWidth, heightBL);
             vertex((x+1) * boxWidth, y * boxWidth, heightTR);
         }
+
+        vertex(cols * boxWidth, y * boxWidth, heightTR);
+        vertex(cols * boxWidth, (y+1) * boxWidth, getHeight(y+1, cols));
     }
 
     endShape();
@@ -114,6 +133,7 @@ function createFPSElement(){
     div.style('color', 'white');
     div.style('left', '0');
     div.style('top', '0');
+    div.style('display', 'none');
 
     return div;
 }
