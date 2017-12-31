@@ -15,8 +15,6 @@ let hueMultiplier = maxHue / rows;
 let hues = Array();
 
 let fpsDiv;
-let frameDurationAverage = 0;
-let frameDurationReadings = 0;
 
 let lastFrameStart;
 
@@ -41,7 +39,7 @@ function setup() {
 }
 
 function draw() {
-    addFrameDuration(millis() - lastFrameStart);
+    setFrameDuration(millis() - lastFrameStart);
     lastFrameStart = millis();
     background(10);
 
@@ -51,16 +49,15 @@ function draw() {
     translate(xOffset, yOffset, 0);
 
     noStroke();
-    
-    for (var y = 0; y < rows; y++) {
+    beginShape(LINES);
+
+    for (var y = 1; y < rows; y++) {
         for (var x = 0; x < cols; x++) {
             var heightTL = getHeight(y, x);
             var heightBL = getHeight(y+1, x);
             var heightTR = getHeight(y, x+1);
-            var heightBR = getHeight(y+1, x+1);
 
             fill(hues[y], 100, 100);
-            beginShape(LINES);
             vertex(x * boxWidth, y * boxWidth, heightTL);
             vertex(x * boxWidth, (y+1) * boxWidth, heightBL);
 
@@ -69,9 +66,10 @@ function draw() {
 
             vertex(x * boxWidth, (y+1) * boxWidth, heightBL);
             vertex((x+1) * boxWidth, y * boxWidth, heightTR);
-            endShape();
         }
     }
+
+    endShape();
 
     shiftHeightMapRows();
 }
@@ -107,8 +105,6 @@ function createFPSElement(){
     return div;
 }
 
-function addFrameDuration(frameDuration){
-    frameDurationAverage = (frameDurationAverage * frameDurationReadings++ + frameDuration) / frameDurationReadings;
-
-    fpsDiv.html("FPS: " + Math.round(1000/frameDurationAverage) + "<br>Frame duration: " + Math.round(frameDurationAverage));
+function setFrameDuration(frameDuration){
+    fpsDiv.html("FPS: " + Math.round(1000/frameDuration) + "<br>Frame duration: " + Math.round(frameDuration));
 }
