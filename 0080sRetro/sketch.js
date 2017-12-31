@@ -18,12 +18,14 @@ let fpsDiv;
 
 let lastFrameStart;
 
+let framesBetweenShifts = 3;
+let framesTilShift = framesBetweenShifts;
+let cameraShiftPerFrame = boxWidth / (framesBetweenShifts+1);
+
 function setup() {
     createCanvas(windowWidth, windowHeight, WEBGL);
     fpsDiv = createFPSElement();
     colorMode(HSB)
-
-    frameRate(30);
 
     for (var y = 0; y < rows+1; y++) {
         var row = Array();
@@ -48,6 +50,17 @@ function draw() {
 
     translate(xOffset, yOffset, 0);
 
+    var shouldShiftHeightMapRows = framesTilShift <= 0;
+
+    if(shouldShiftHeightMapRows){
+        shiftHeightMapRows();
+    }
+    else {
+        var yShift = cameraShiftPerFrame * (framesBetweenShifts - framesTilShift + 1);
+        translate(0, yShift, 0);
+        framesTilShift--;
+    }
+
     noStroke();
     beginShape(LINES);
 
@@ -70,8 +83,6 @@ function draw() {
     }
 
     endShape();
-
-    shiftHeightMapRows();
 }
 
 function getHeight(y, x){
@@ -92,6 +103,8 @@ function shiftHeightMapRows(){
     heightMapOffset--;
     if(heightMapOffset < 0)
         heightMapOffset = rows;
+
+    framesTilShift = framesBetweenShifts;
 }
 
 function createFPSElement(){
