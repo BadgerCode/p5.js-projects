@@ -22,6 +22,17 @@ let framesBetweenShifts = 3;
 let framesTilShift = framesBetweenShifts;
 let cameraShiftPerFrame;
 
+let backgroundWidth;
+let backgroundHeight;
+const backgroundRows = 75;
+const startBackgroundColour = [168, 53.6, 11];
+const endBackgroundColour = [312, 42, 69];
+const backgroundColourChange = [
+    (endBackgroundColour[0]-startBackgroundColour[0])/backgroundRows, 
+    (endBackgroundColour[1]-startBackgroundColour[1])/backgroundRows, 
+    (endBackgroundColour[2]-startBackgroundColour[2])/backgroundRows
+];
+
 function setup() {
     createCanvas(windowWidth, windowHeight, WEBGL);
     fpsDiv = createFPSElement();
@@ -30,6 +41,9 @@ function setup() {
     xOffset = -cols * boxWidth / 2;
     yOffset = -rows * boxWidth * 0.80;
     cameraShiftPerFrame = boxWidth / (framesBetweenShifts+1);
+
+    backgroundWidth = windowWidth * 2;
+    backgroundHeight = windowHeight * 2;
 
     var hueMultiplier = maxHue / rows;
 
@@ -59,8 +73,10 @@ function draw() {
         setFrameDuration(millis() - lastFrameStart);
 
     lastFrameStart = millis();
-    background(10);
 
+    drawbackground();
+
+    push();
     translate(0, 200, 300);
     rotateX(PI / 3.5);
 
@@ -102,6 +118,35 @@ function draw() {
     }
 
     endShape();
+    pop();
+}
+
+function drawbackground() {
+    var rowHeight = backgroundHeight / backgroundRows;
+    var currentColour = startBackgroundColour.slice();
+
+    background(25);
+
+    push();
+    translate(-backgroundWidth/2, -backgroundHeight/2, -500);
+    
+
+    for(var i = 0; i < backgroundRows; i++){
+        var y = i * rowHeight;
+
+        beginShape();
+        fill(currentColour);
+        vertex(0, y, 0);
+        vertex(backgroundWidth, y, 0);
+        vertex(backgroundWidth, y + rowHeight, 0);
+        vertex(0, y + rowHeight, 0);
+        endShape(CLOSE);
+
+        currentColour[0] += backgroundColourChange[0];
+        currentColour[1] += backgroundColourChange[1];
+        currentColour[2] += backgroundColourChange[2];
+    }
+    pop();
 }
 
 function getHeight(y, x){
