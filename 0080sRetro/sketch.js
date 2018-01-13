@@ -4,6 +4,8 @@ let boxWidth = 30;
 let xOffset;
 let yOffset;
 let noiseScale = 0.1;
+let xMinHeights = [];
+let xMaxHeights = [];
 let noiseYOffset = 0;
 
 let heightMap = Array();
@@ -47,13 +49,10 @@ function setup() {
 
     var hueMultiplier = maxHue / rows;
 
-    for (var y = 0; y < rows+1; y++) {
-        var row = Array();
-        for (var x = 0; x < cols+1; x++) {
-            row.push(map(noise(x * noiseScale, y * noiseScale), 0, 1, 0, 300));
-        }
+    generateXHeights();
+    generateHeightMap();
 
-        heightMap.push(row);
+    for (var y = 0; y < rows+1; y++) {
         hues.push(maxHue - hueMultiplier * y);
     }
 
@@ -149,9 +148,31 @@ function drawbackground() {
     pop();
 }
 
+function generateXHeights(){
+    for(let x = 0; x < cols+1; x++){
+        
+        var minHeight = 0;
+        var maxHeight = minHeight + 500;
+
+        xMinHeights.push(minHeight);
+        xMaxHeights.push(maxHeight);
+    }
+}
+
 function getHeight(y, x){
     var yIndex = (y+heightMapOffset) % (rows+1);
     return heightMap[yIndex][x];
+}
+
+function generateHeightMap(){
+    for (var y = 0; y < rows+1; y++) {
+        var row = Array();
+        for (var x = 0; x < cols+1; x++) {
+            row.push(generateHeight(x, y));
+        }
+
+        heightMap.push(row);
+    }
 }
 
 function shiftHeightMapRows(){
@@ -159,7 +180,7 @@ function shiftHeightMapRows(){
 
     var row = Array();
     for (var x = 0; x < cols+1; x++) {
-        row.push(map(noise(x * noiseScale, heightMapPosition * noiseScale), 0, 1, 0, 300));
+        row.push(generateHeight(x, heightMapPosition));
     }
 
     heightMap[heightMapOffset] = row;
@@ -169,6 +190,10 @@ function shiftHeightMapRows(){
         heightMapOffset = rows;
 
     framesTilShift = framesBetweenShifts;
+}
+
+function generateHeight(x, y){
+    return map(noise(x * noiseScale, y * noiseScale), 0, 1, xMinHeights[x], xMaxHeights[x]);
 }
 
 function createFPSElement(){
